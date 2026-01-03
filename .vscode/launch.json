@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Django Debug",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/manage.py",
+      "args": ["runserver"],
+      "django": true,
+      "justMyCode": true,
+      "python": "${workspaceFolder}/venv/Scripts/python.exe"
+    }
+  ]
+}
