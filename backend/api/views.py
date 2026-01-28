@@ -1,16 +1,17 @@
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.mixins import CreateModelMixin, UpdateModelMixin
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from .serializers import AuthenticationSerializer
+from .serializers import (RegisterSerializer, LoginSerializer)
 
-class LoginViewSet(APIView):
-    serializer_class = AuthenticationSerializer
+class AuthenticationViewSet(APIView):
+    serializer_class = LoginSerializer
     
     def post(self, request, *args, **kwargs):
-        serializer = AuthenticationSerializer(data=request.data)
+        serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data.get('email')
         password = serializer.validated_data.get('password')
@@ -25,3 +26,5 @@ class LoginViewSet(APIView):
         return Response({'error': "Username or password incorrect"}, status=status.HTTP_401_UNAUTHORIZED)
         
 
+class RegisterViewSet(CreateModelMixin, GenericViewSet):
+    serializer_class = RegisterSerializer
