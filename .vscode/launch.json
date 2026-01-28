@@ -3,13 +3,18 @@
   "configurations": [
     {
       "name": "Django Debug",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/backend/manage.py",
       "args": ["runserver"],
       "django": true,
       "justMyCode": true,
-      "python": "${workspaceFolder}/venv/Scripts/python.exe"
+      "console": "integratedTerminal",
+      "python": "C:/Users/abuba/OneDrive/Documents/My Django Projects/Django auth react/.venv/Scripts/python.exe",
+      "cwd": "${workspaceFolder}/backend",
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "backend.settings"
+      }
     }
   ]
 }
