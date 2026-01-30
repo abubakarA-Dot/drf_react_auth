@@ -33,3 +33,12 @@ class RegisterSerializer(ModelSerializer):
             user.set_password(password)
             user.save(update_fields=["password"])
         return user
+
+
+class UserSerializer(ModelSerializer):
+    """Serializer for user object"""
+    
+    class Meta:
+        model = get_user_model()
+        exclude = []
+    
