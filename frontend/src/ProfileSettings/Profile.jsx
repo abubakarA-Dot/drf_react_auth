@@ -19,6 +19,7 @@ function Profile() {
       console.error("Logout error:", error);
     }
   };
+  if (!user) return history.push("/login");
 
   return (
     <div>
