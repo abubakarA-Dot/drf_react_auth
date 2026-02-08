@@ -1,29 +1,30 @@
-import { 
-  Navbar, 
-  NavbarBrand, 
+import { useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom';
+import {
+  Navbar,
+  NavbarBrand,
   NavbarToggler,
   Collapse,
-  Nav, 
-  NavItem, 
+  Nav,
+  NavItem,
   NavLink,
   UncontrolledDropdown,
   DropdownToggle,
   DropdownMenu,
   DropdownItem
-} from "reactstrap";
-import { Link, useLocation, useHistory } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import apiClient from "../apiClient";
-import { useState } from "react";
+} from 'reactstrap';
+import apiClient from '../apiClient';
 
-function AppNavbar() {
+const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const history = useHistory();
   const isAuthPage = ["/login", "/register"].includes(location.pathname);
 
   const { data: user } = useQuery({
-    queryKey: ["currentUser"],
+    queryKey: ["users/me"],
     queryFn: () => apiClient.get("/users/me").then(res => res.data),
     enabled: !isAuthPage,
     retry: false,
@@ -41,7 +42,7 @@ function AppNavbar() {
   };
 
   return (
-    <Navbar color="dark" dark expand="md" className="px-4 shadow-sm">
+    <Navbar color="dark" dark expand="md" className="shadow-sm">
       <NavbarBrand tag={Link} to="/" className="fw-bold">
         MyApp
       </NavbarBrand>
@@ -55,11 +56,6 @@ function AppNavbar() {
               <NavItem>
                 <NavLink tag={Link} to="/dashboard">
                   Dashboard
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink tag={Link} to="/profile">
-                  Profile
                 </NavLink>
               </NavItem>
             </>
@@ -84,7 +80,7 @@ function AppNavbar() {
               </DropdownMenu>
             </UncontrolledDropdown>
           ) : (
-            !isAuthPage && (
+            !user && (
               <>
                 <NavItem>
                   <NavLink tag={Link} to="/login">
@@ -103,6 +99,6 @@ function AppNavbar() {
       </Collapse>
     </Navbar>
   );
-}
+};
 
-export default AppNavbar;
+export default Header;
