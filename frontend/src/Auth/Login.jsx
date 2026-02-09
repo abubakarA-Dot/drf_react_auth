@@ -1,26 +1,16 @@
 import { Button, Form } from 'reactstrap'
 import client from '../apiClient'
 import { useHistory } from "react-router-dom"
-import { useEffect } from 'react'
+import { useAuth } from './AuthContext'
 
 function Login() {
     const history = useHistory()
-    
-    useEffect(() => {
-        getLoggedInUser()
-        
-        async function getLoggedInUser() {
-            try {
-                const response = await client.get('/users/me')
-                if (response.status === 200) {
-                    console.log("Logged in user found. Redirecting to profile page")
-                    history.push("/profile")
-                }
-            } catch (error) {
-                console.log("No active session")
-            }
-        }
-    }, [history])
+    const { user, refetch } = useAuth()
+
+    if (user) {
+        history.push("/profile")
+        return null
+    }
 
     const handleLogin = async (e) => {
         e.preventDefault()
@@ -33,6 +23,7 @@ function Login() {
         try {
             await client.post('/login', data)
             console.log("User logged in successfully")
+            await refetch()
             history.push("/profile")
         } catch (error) {
             console.log(error?.response, "error data")
