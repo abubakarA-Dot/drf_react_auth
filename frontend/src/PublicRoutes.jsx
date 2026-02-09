@@ -1,15 +1,15 @@
-// new
 import { Route, Redirect } from "react-router-dom"
+import { useAuth } from "./Auth/AuthContext"
 
 const PublicRoute = ({ component: Component, ...rest }) => {
-  const isAuthenticated = false // replace later
+  const { user } = useAuth()
 
   return (
     <Route
       {...rest}
       render={(props) =>
-        isAuthenticated ? (
-          <Redirect to="/dashboard" />
+        user ? (
+          <Redirect to="/profile" />
         ) : (
           <Component {...props} />
         )

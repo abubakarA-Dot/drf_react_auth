@@ -1,7 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useHistory } from 'react-router-dom/cjs/react-router-dom';
+import { Link, useLocation, useHistory } from 'react-router-dom';
 import {
   Navbar,
   NavbarBrand,
@@ -15,30 +13,20 @@ import {
   DropdownMenu,
   DropdownItem
 } from 'reactstrap';
-import apiClient from '../apiClient';
+import { useAuth } from '../Auth/AuthContext';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const history = useHistory();
+  const { user, isLoading, logout } = useAuth();
+  
   const isAuthPage = ["/login", "/register"].includes(location.pathname);
-
-  const { data: user } = useQuery({
-    queryKey: ["users/me"],
-    queryFn: () => apiClient.get("/users/me").then(res => res.data),
-    enabled: !isAuthPage,
-    retry: false,
-  });
-
   const toggle = () => setIsOpen(!isOpen);
 
   const handleLogout = async () => {
-    try {
-      await apiClient.post("/logout");
-      history.push("/login");
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+    await logout();
+    history.push("/login");
   };
 
   return (
@@ -63,7 +51,12 @@ const Header = () => {
         </Nav>
         
         <Nav className="ms-auto" navbar>
-          {user ? (
+          {isLoading ? (
+            // Show nothing or a skeleton while loading
+            <NavItem>
+              <span className="nav-link text-muted">...</span>
+            </NavItem>
+          ) : user ? (
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret className="d-flex align-items-center">
                 <span className="me-2">👤</span>
@@ -80,7 +73,7 @@ const Header = () => {
               </DropdownMenu>
             </UncontrolledDropdown>
           ) : (
-            !user && (
+            !isAuthPage && (
               <>
                 <NavItem>
                   <NavLink tag={Link} to="/login">
