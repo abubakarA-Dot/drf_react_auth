@@ -8,11 +8,12 @@ import { useQuery } from '@tanstack/react-query';
 import apiClient from '../apiClient';
 import { useModal } from "../useModal";
 import { useState } from 'react';
+import NotificationManager from '../common/NotificationManager';
 
 const UsersList = () => {
     const [userId, setUserId] = useState(null);
     const { isOpen, close, toggle } = useModal();
-    const {data: users, loading, refetch} = useQuery({
+    const {data: users, refetch} = useQuery({
         queryKey: ["users"],
         queryFn: () => apiClient.get("/users/").then(res => res.data),
         staleTime: 5 * 60 * 1000,
@@ -22,7 +23,7 @@ const UsersList = () => {
         await apiClient.delete(`/users/${userId}/`);
         close();
         refetch();
-        alert("User deleted successfully");
+        NotificationManager.success("User deleted successfully");
     }
     
     return (
