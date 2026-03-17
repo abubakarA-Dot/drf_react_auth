@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Form, FormGroup, Label, Input, Button } from "reactstrap";
+import { Form, FormGroup, Label, Input, Button, Row, Col } from "reactstrap";
 import apiClient from "../apiClient";
 import { useQuery } from "@tanstack/react-query";
 import Page from "../Page";
@@ -42,22 +42,28 @@ export const EditUser = () => {
         <FormProvider {...methods}>
         <Form onSubmit={handleSubmit(onSubmit)}>
 
-            <FormGroup>
-                <Label for="name">Name</Label>
-                <FormInput
-                    id="name"
-                    name="name"
-                    type="text"
-                />
-            </FormGroup>
-            <FormGroup>
-                <Label for="company">Company</Label>
-                <FormInput
-                    id="company"
-                    name="company"
-                    type="text"
-                />
-            </FormGroup>
+            <Row>
+                <Col md={6}>
+                    <FormGroup>
+                        <Label for="name">Name</Label>
+                        <FormInput
+                            id="name"
+                            name="name"
+                            type="text"
+                        />
+                    </FormGroup>
+                </Col>
+                <Col md={6}>
+                    <FormGroup>
+                        <Label for="company">Company</Label>
+                        <FormInput
+                            id="company"
+                            name="company"
+                            type="text"
+                        />
+                    </FormGroup>
+                </Col>
+            </Row>
 
             <FormGroup>
                 <Label for="email">Email</Label>
