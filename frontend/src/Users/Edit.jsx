@@ -5,6 +5,7 @@ import apiClient from "../apiClient";
 import { useQuery } from "@tanstack/react-query";
 import Page from "../Page";
 import { FormInput } from "../FormInput";
+import NotificationManager from "../common/NotificationManager";
 
 export const EditUser = () => {
     const methods = useForm();
@@ -23,10 +24,10 @@ export const EditUser = () => {
   const onSubmit = async (data) => {
     try {
         await apiClient.put(`/users/${userId}/`, data);
-        alert("User updated successfully");
+        NotificationManager.success("User updated successfully");
     } catch (error) {
         console.error("Error updating user:", error);
-        alert("Failed to update user");
+        NotificationManager.danger("Failed to update user. Please try again.");
     }
   };
 
