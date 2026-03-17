@@ -8,13 +8,19 @@ import { FormInput } from "../FormInput";
 import NotificationManager from "../common/NotificationManager";
 
 export const EditUser = () => {
-    const methods = useForm();
-    const { register, handleSubmit, setValue, reset, getValues } = methods;
     const userId = window.location.pathname.split("/").pop();
     const { data:user, refetch } = useQuery({
         queryKey: ["users", userId],
         queryFn: () => apiClient.get(`/users/${userId}`).then(res => res.data),
     });
+    const methods = useForm({
+        defaultValues: {
+        name: user?.name || "",
+        company: user?.company || "",
+        email: user?.email || ""
+        }
+    });
+    const { handleSubmit, reset } = methods;
     useEffect(() => {
         if (user) {
             reset(user);
