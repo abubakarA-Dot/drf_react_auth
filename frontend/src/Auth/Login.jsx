@@ -22,11 +22,9 @@ function Login() {
 
         try {
             await client.post('/login', data)
-            console.log("User logged in successfully")
             await refetch()
             history.push("/profile")
         } catch (error) {
-            console.log(error?.response, "error data")
             console.error("Login failed", error)
         }
     }
@@ -41,6 +39,9 @@ function Login() {
                 <br />
                 <Button className="btn btn-primary" type="submit">Login</Button>
             </Form>
+            <span className="mt-2 d-block">
+                Don't have an account? <a href="/register">Register here</a>
+            </span>
         </div>
     )
 }

@@ -66,6 +66,9 @@ const Header = () => {
                 <DropdownItem tag={Link} to="/profile">
                   My Profile
                 </DropdownItem>
+                <DropdownItem tag={Link} to="/settings">
+                  Settings
+                </DropdownItem>
                 <DropdownItem divider />
                 <DropdownItem onClick={handleLogout}>
                   Logout
