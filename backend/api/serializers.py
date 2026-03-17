@@ -40,5 +40,15 @@ class UserSerializer(ModelSerializer):
     
     class Meta:
         model = get_user_model()
-        exclude = []
+        exclude = ['groups', 'user_permissions']
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'last_login': {'read_only': True},
+        }
+
+
+class UserUpdateSerializer(ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ['email', 'name', 'company']
     

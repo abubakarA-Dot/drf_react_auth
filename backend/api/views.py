@@ -10,7 +10,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from .serializers import (RegisterSerializer, LoginSerializer, UserSerializer)
+from .serializers import (RegisterSerializer, LoginSerializer, UserSerializer, UserUpdateSerializer)
+from .models import User
 
 from django.contrib.auth import login
 
@@ -107,8 +108,20 @@ class RegisterViewSet(CreateModelMixin, GenericViewSet):
 
 
 class UserViewSet(ModelViewSet):
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes=[IsAuthenticated]
+    
+    def get_serializer_class(self):
+        if self.request and self.request.method in ['PUT', 'PATCH']:
+            return UserUpdateSerializer
+        return UserSerializer
+    
+    # def update(self, request, *args, **kwargs): in future, we can add this method to make sure that users can only update their own profile. 
+    #     instance = self.get_object()
+    #     if instance.pk != request.user.pk:
+    #         return Response({"detail": "You can only update your own profile"}, status=status.HTTP_403_FORBIDDEN)
+    #     return super().update(request, *args, **kwargs)
 
     @action(detail=False, methods=['get'])
     def me(self, request):

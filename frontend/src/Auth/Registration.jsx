@@ -5,7 +5,6 @@ import { useHistory } from "react-router-dom"
 function Registration() {
   const history = useHistory()
   const handleRegistration = async (e) => {
-    console.log(e, "gfr");
     
         e.preventDefault()
 
@@ -17,10 +16,8 @@ function Registration() {
 
         try {
             await client.post('/register', data)
-            console.log("User registered successfully")
             history.push("/login")
         } catch (error) {
-            console.log(error?.response, "error data")
             console.error("Registration failed", error)
         }
     }
