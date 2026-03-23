@@ -1,83 +1,126 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Form, FormGroup, Label, Input, Button, Row, Col } from "reactstrap";
+import {
+    Form, FormGroup, Label, Button, Row, Col,
+    Nav, NavItem, NavLink, TabPane, TabContent
+} from "reactstrap";
+import classnames from "classnames";
 import apiClient from "../apiClient";
 import { useQuery } from "@tanstack/react-query";
 import Page from "../Page";
 import { FormInput } from "../FormInput";
 import NotificationManager from "../common/NotificationManager";
 
+const ROLES = [
+    { id: "admin",   label: "Admin",   description: "Full access to everything." },
+    { id: "manager", label: "Manager", description: "Can manage users and content." },
+    { id: "editor",  label: "Editor",  description: "Can create and edit content." },
+    { id: "viewer",  label: "Viewer",  description: "Read-only access." },
+];
+
 export const EditUser = () => {
+    const [activeRole, setActiveRole] = useState("admin");
+    const [selectedRoles, setSelectedRoles] = useState([]);
+
     const userId = window.location.pathname.split("/").pop();
-    const { data:user, refetch } = useQuery({
+    const { data: user } = useQuery({
         queryKey: ["users", userId],
         queryFn: () => apiClient.get(`/users/${userId}`).then(res => res.data),
     });
+
     const methods = useForm({
-        defaultValues: {
-        name: user?.name || "",
-        company: user?.company || "",
-        email: user?.email || ""
-        }
+        defaultValues: { name: "", company: "", email: "", password: "" }
     });
     const { handleSubmit, reset } = methods;
+
     useEffect(() => {
         if (user) {
             reset(user);
+            setSelectedRoles(user.roles || []);
         }
     }, [user, reset]);
 
-  const onSubmit = async (data) => {
-    try {
-        await apiClient.put(`/users/${userId}/`, data);
-        NotificationManager.success("User updated successfully");
-    } catch (error) {
-        console.error("Error updating user:", error);
-        NotificationManager.danger("Failed to update user. Please try again.");
-    }
-  };
+    const toggleRole = (roleId) => {
+        setSelectedRoles(prev =>
+            prev.includes(roleId) ? prev.filter(r => r !== roleId) : [...prev, roleId]
+        );
+    };
 
-  return (
-    <Page title="Edit User">
-        <FormProvider {...methods}>
-        <Form onSubmit={handleSubmit(onSubmit)}>
+    const onSubmit = async (data) => {
+        try {
+            await apiClient.put(`/users/${userId}/`, { ...data, roles: selectedRoles });
+            NotificationManager.success("User updated successfully");
+        } catch (error) {
+            console.error("Error updating user:", error);
+            NotificationManager.danger("Failed to update user. Please try again.");
+        }
+    };
 
-            <Row>
-                <Col md={6}>
+    return (
+        <Page title="Edit User">
+            <FormProvider {...methods}>
+                <Form onSubmit={handleSubmit(onSubmit)}>
+
+                    <Row>
+                        <Col md={6}>
+                            <FormGroup>
+                                <Label for="name">Name</Label>
+                                <FormInput id="name" name="name" type="text" />
+                            </FormGroup>
+                        </Col>
+                        <Col md={6}>
+                            <FormGroup>
+                                <Label for="company">Company</Label>
+                                <FormInput id="company" name="company" type="text" />
+                            </FormGroup>
+                        </Col>
+                    </Row>
+
                     <FormGroup>
-                        <Label for="name">Name</Label>
-                        <FormInput
-                            id="name"
-                            name="name"
-                            type="text"
-                        />
+                        <Label for="email">Email</Label>
+                        <FormInput id="email" name="email" type="email" />
                     </FormGroup>
-                </Col>
-                <Col md={6}>
+
                     <FormGroup>
-                        <Label for="company">Company</Label>
-                        <FormInput
-                            id="company"
-                            name="company"
-                            type="text"
-                        />
+                        <Label>Roles</Label>
+                        <Nav tabs>
+                            {ROLES.map(role => (
+                                <NavItem key={role.id}>
+                                    <NavLink
+                                        className={classnames({ active: activeRole === role.id })}
+                                        onClick={() => setActiveRole(role.id)}
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        {role.label}
+                                    </NavLink>
+                                </NavItem>
+                            ))}
+                        </Nav>
+
+                        <TabContent activeTab={activeRole} className="border border-top-0 rounded-bottom p-3">
+                            {ROLES.map(role => (
+                                <TabPane tabId={role.id} key={role.id}>
+                                    <p className="text-muted">{role.description}</p>
+                                    <FormGroup check>
+                                        <Label check>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedRoles.includes(role.id)}
+                                                onChange={() => toggleRole(role.id)}
+                                                className="me-2"
+                                            />
+                                            Assign <strong>{role.label}</strong> role to this user
+                                        </Label>
+                                    </FormGroup>
+                                </TabPane>
+                            ))}
+                        </TabContent>
                     </FormGroup>
-                </Col>
-            </Row>
 
-            <FormGroup>
-                <Label for="email">Email</Label>
-                <FormInput
-                    id="email"
-                    name="email"
-                    type="email"
-                />
-            </FormGroup>
+                    <Button color="primary">Save Changes</Button>
 
-            <Button color="primary">Submit</Button>
-
-        </Form>
-        </FormProvider>
-    </Page>
-  );
-}
+                </Form>
+            </FormProvider>
+        </Page>
+    );
+};
