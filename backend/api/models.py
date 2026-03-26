@@ -6,6 +6,9 @@ from django.contrib.auth.models import (
 )
 from django.conf import settings
 
+from api.common import UserRole
+from api.permissions import Permission
+
 
 class UserManager(BaseUserManager):
     """Manager for Users"""
@@ -38,8 +41,29 @@ class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=255)
     company = models.CharField(max_length=255, blank=True)
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    role = models.CharField(max_length=5, choices=UserRole.choices, default='RD')
 
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+
+class Restaurant(models.Model):
+    name = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='restaurants')
+    restaurant_number = models.CharField(max_length=20, unique=True)
+    tax_number = models.CharField(max_length=20, unique=True)
+    
+
+class ConnectedRestaurantUser(models.Model):
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    email = models.EmailField(max_length=255, unique=True)
+    role = models.CharField(max_length=5, choices=UserRole.choices, default='RD')
+    is_active = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='restaurant_users')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='restaurant_members', null=True)
+    permissions = models.OneToOneField(Permission, related_name='user_permissions', on_delete=models.CASCADE, null=True)

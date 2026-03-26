@@ -12,14 +12,15 @@ import { FormInput } from "../FormInput";
 import NotificationManager from "../common/NotificationManager";
 
 const ROLES = [
-    { id: "admin",   label: "Admin",   description: "Full access to everything." },
-    { id: "manager", label: "Manager", description: "Can manage users and content." },
-    { id: "editor",  label: "Editor",  description: "Can create and edit content." },
-    { id: "viewer",  label: "Viewer",  description: "Read-only access." },
+    { id: "superuser",   label: "Superuser",   description: "Full access to everything." },
+    { id: "manager", label: "Manager", description: "Manages the platform." },
+    { id: "accountant",  label: "Accountant",  description: "Handles financial records and reports." },
+    { id: "rider",  label: "Rider",  description: "Can accept or reject orders and deliver them." },
+    { id: "customer_support",  label: "Customer support",  description: "Manages customer inquiries and support tickets." },
 ];
 
 export const EditUser = () => {
-    const [activeRole, setActiveRole] = useState("admin");
+    const [activeRole, setActiveRole] = useState("superuser");
     const [selectedRoles, setSelectedRoles] = useState([]);
 
     const userId = window.location.pathname.split("/").pop();
