@@ -43,6 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     role = models.CharField(max_length=5, choices=UserRole.choices, default='RD')
+    permissions = models.OneToOneField(Permission, related_name='permissions', on_delete=models.CASCADE, null=True)
 
     objects = UserManager()
 
@@ -67,3 +68,11 @@ class ConnectedRestaurantUser(models.Model):
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='restaurant_users')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='restaurant_members', null=True)
     permissions = models.OneToOneField(Permission, related_name='user_permissions', on_delete=models.CASCADE, null=True)
+    
+    @property
+    def user_perms(self):
+        return self.permissions.for_user()
+
+    @property
+    def name(self):
+        return f'{self.first_name} {self.last_name}'

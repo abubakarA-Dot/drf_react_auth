@@ -15,3 +15,8 @@ class Permission(models.Model):
     can_add_invoices = models.BooleanField(default=False)
     can_edit_invoices = models.BooleanField(default=False)
     is_customer_support = models.BooleanField(default=False)
+    
+    def for_user(self):
+        {
+            attribute.name: getattr(self, attribute.name) for attribute in self._meta.fields if isinstance(attribute, models.BooleanField)
+        }

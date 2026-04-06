@@ -18,10 +18,10 @@ const Settings = () => {
             <Row className="g-4">
                 {cards.map((card, idx) => (
                     <Col key={idx} md={6} lg={3}>
-                        <Card 
-                            className="h-100 cursor-pointer shadow-sm border-0 hover-shadow transition"
+                        <Card
+                            className="h-100 cursor-pointer shadow-sm border hover-shadow"
                             onClick={() => (window.location.href = card.url)}
-                            style={{ borderRadius: '12px' }}
+                            style={{ borderRadius: '20px' }}
                         >
                             <CardBody className="d-flex flex-column align-items-start">
                                 <div className="mb-3 text-primary">{card.icon}</div>

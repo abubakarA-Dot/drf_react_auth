@@ -5,7 +5,9 @@ from django.contrib.auth import (
     authenticate,
 )
 
-from .models import User
+from api.permissions import Permission
+
+from .models import ConnectedRestaurantUser, Restaurant, User
 
 class LoginSerializer(Serializer):
     email = CharField()
@@ -35,8 +37,15 @@ class RegisterSerializer(ModelSerializer):
         return user
 
 
+
+class PermissionSerializer(ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = '__all__'
+
 class UserSerializer(ModelSerializer):
     """Serializer for user object"""
+    permissions = PermissionSerializer()
     
     class Meta:
         model = get_user_model()
@@ -48,7 +57,58 @@ class UserSerializer(ModelSerializer):
 
 
 class UserUpdateSerializer(ModelSerializer):
+    permissions = PermissionSerializer()
     class Meta:
         model = get_user_model()
-        fields = ['email', 'name', 'company']
+        fields = ['email', 'name', 'company', 'role', 'permissions']
+
+    def update(self, instance, validated_data):
+        permissions = validated_data.get('permissions', {})
+        permission = Permission.objects.get(id=permissions)
+        instance.permissions = permission
+        instance.save()
+        return instance
+
+
+class RestaurantSerializer(ModelSerializer):
+    class Meta:
+        model = Restaurant
+        fields = '__all__'
+
+
+class RestaurantUserSerializer(ModelSerializer):
+    class Meta:
+        model = ConnectedRestaurantUser
+        fields = ['id', 'email', 'name', 'first_name', 'last_name', 'role', 'user_perms', 'restaurant', 'is_active']
+    
+    def create(self, validated_data):
+        permissions = validated_data.get('permissions', {})
+        user, created = User.objects.get_or_create(
+            email = validated_data.get("email"),
+            is_active = False,
+        )
+        perm_obj = Permission.objects.create(**permissions)
+        restaurant_user = ConnectedRestaurantUser.objects.create(
+            user=user,
+            permissions=perm_obj,
+            role = validated_data.get("role", "RD"),
+            restaurant=validated_data.get("restaurant"),
+            is_active=False
+        )
+        # send email invitation now.
+        return restaurant_user
+
+    def update(self, instance, validated_data):
+        permissions = validated_data.get('permissions', {})
+        instance.role = validated_data.get("role", "RD")
+        instance.email = validated_data.get("email", "")
+        instance.first_name = validated_data.get("first_name", "")
+        instance.last_name = validated_data.get("last_name", "")
+        instance.save()
+        perm_obj = instance.user_perms
+        for key, val in permissions.items():
+            setattr(perm_obj, key, val)
+        if perm_obj:
+            perm_obj.save()
+        return instance
     

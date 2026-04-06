@@ -14,13 +14,13 @@ const UsersList = () => {
     const [userId, setUserId] = useState(null);
     const { isOpen, close, toggle } = useModal();
     const {data: users, refetch} = useQuery({
-        queryKey: ["users"],
-        queryFn: () => apiClient.get("/users/").then(res => res.data),
+        queryKey: ["restaurant_users"],
+        queryFn: () => apiClient.get("/restaurant_users/").then(res => res.data),
         staleTime: 5 * 60 * 1000,
     });
 
     const handleDelete = async () => {
-        await apiClient.delete(`/users/${userId}/`);
+        await apiClient.delete(`/restaurant_users/${userId}/`);
         close();
         refetch();
         NotificationManager.success("User deleted successfully");

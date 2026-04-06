@@ -10,8 +10,10 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from .serializers import (RegisterSerializer, LoginSerializer, UserSerializer, UserUpdateSerializer)
-from .models import User
+from .serializers import (
+    RegisterSerializer, LoginSerializer, RestaurantUserSerializer, UserSerializer, UserUpdateSerializer, RestaurantSerializer
+    )
+from .models import ConnectedRestaurantUser, Restaurant, User
 
 from django.contrib.auth import login
 
@@ -134,3 +136,19 @@ class ProfileViewSet(ModelViewSet):
 
     def get_queryset(self):
         return self.request.user.__class__.objects.filter(pk=self.request.user.pk)
+
+
+class RestaurantViewSet(ModelViewSet):
+    queryset = Restaurant.objects.select_related('owner')
+    serializer_class = RestaurantSerializer
+    permission_classes = [IsAuthenticated]
+
+    # def get_queryset(self):
+    #     return self.request.user.__class__.objects.filter(pk=self.request.user.pk)
+class RestaurantUserViewSet(ModelViewSet):
+    queryset = ConnectedRestaurantUser.objects.select_related('user', 'restaurant', 'permissions')
+    serializer_class = RestaurantUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    # def get_queryset(self):
+    #     return self.request.user.__class__.objects.filter(pk=self.request.user.pk)
